@@ -1,10 +1,3 @@
-//{ Driver Code Starts
-#include <bits/stdc++.h>
-using namespace std;
-
-
-// } Driver Code Ends
-// User function template for C++
 #include <iostream>
 #include <sstream>
 #include <cstdio>
@@ -146,18 +139,18 @@ public:
 
 
 
-//{ Driver Code Starts.
+
 
 int main() {
     int t;
     cin >> t;
-    cin.ignore(); // to ignore the newline after the integer input
+    cin.ignore(); 
     while (t--) {
         int n;
         vector<int> a;
         string input;
 
-        // Input format: first number n followed by the array elements
+
         getline(cin, input);
         stringstream ss(input);
         int num;
@@ -172,4 +165,3 @@ int main() {
     return 0;
 }
 
-// } Driver Code Ends
