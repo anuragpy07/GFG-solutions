@@ -6,84 +6,93 @@ using namespace std;
 // } Driver Code Ends
 // design the class in the most optimal way
 
-#include <iostream> 
-#include <sstream> 
-#include <cstdio> 
-#include <cmath> 
-#include <cstring> 
-#include <cctype> 
-#include <string> 
-#include <vector> 
-#include <list> 
-#include <set> 
-#include <map> 
-#include <queue> 
-#include <stack> 
-#include <algorithm> 
-#include <functional> 
-#include <unordered_map>
-using namespace std;  
- 
-#define DEBUG(x) cout << '>' << #x << ':' << x << endl; 
-#define REP(i,n) for(int i=0;i<(n);i++) 
-#define FOR(i,a,b) for(int i=(a);i<=(b);i++) 
-#define FORD(i,a,b) for(int i=(a);i>=(b);i--) 
-inline bool EQ(double a, double b) { return fabs(a-b) < 1e-9; } 
- 
-const int INF = 1<<29; 
-typedef long long ll; 
- 
-inline int two(int n) { return 1 << n; } 
-inline int test(int n, int b) { return (n>>b)&1; } 
-inline void set_bit(int & n, int b) { n |= two(b); } 
-inline void unset_bit(int & n, int b) { n &= ~two(b); } 
-inline int last_bit(int n) { return n & (-n); } 
-inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; } 
- 
-template<class T> void chmax(T & a, const T & b) { a = max(a, b); } 
-template<class T> void chmin(T & a, const T & b) { a = min(a, b); } 
-
-class LRUCache {
-private:
-    int capacity;
-    list<pair<int, int>> cache_list;
-    unordered_map<int, list<pair<int, int>>::iterator> cache_map;
-
-public:
-    LRUCache(int cap) {
-        capacity = cap;
-    }
-    
-    int get(int key) {
-        return cache_map.find(key) != cache_map.end() ? 
-            (moveToFront(key), cache_map[key]->second) : -1;
-    }
-    
-    void set(int key, int value) {
-        while(cache_map.find(key) != cache_map.end()) {
-            cache_list.erase(cache_map[key]);
-            cache_map.erase(key);
-        }
-        
-        while(cache_list.size() >= capacity) {
-            cache_map.erase(cache_list.back().first);
-            cache_list.pop_back();
-        }
-        
-        cache_list.push_front({key, value});
-        cache_map[key] = cache_list.begin();
-    }
-    
-private:
-    void moveToFront(int key) {
-        pair<int, int> node = *cache_map[key];
-        cache_list.erase(cache_map[key]);
-        cache_list.push_front(node);
-        cache_map[key] = cache_list.begin();
+// design the class in the most optimal way
+struct Node{
+    int key;
+    int data;
+    Node* prev;
+    Node* next;
+    Node(int k,int d){
+        data=d;
+        key=k;
+        prev=NULL;
+        next=NULL;
     }
 };
 
+class LRUCache {
+  private:
+  int capacity;
+  Node* head;
+  Node* tail;
+  unordered_map<int,Node*>mp;
+  int count;
+  public:
+    // Constructor for initializing the cache capacity with the given value.
+    LRUCache(int cap) {
+        // code here
+        capacity=cap;
+        count=0;
+        head=new Node(-1,-1);
+        tail=new Node(-1,-1);
+        head->next=tail;
+        tail->prev=head;
+    }
+    
+    void deleteNode(Node* node){
+        Node* previousNode = node->prev;
+        Node* nextNode = node->next;
+        previousNode->next = nextNode;
+        nextNode->prev = previousNode;
+        count--;
+        return;
+    }
+    void addNode(Node* node){
+        Node* temp = head->next;
+        node->next = temp;
+        node->prev = head;
+        head->next = node;
+        temp->prev = node;
+        count++;
+        return;
+    }
 
+    // Function to return value corresponding to the key.
+    int get(int key) {
+        // your code here
+        if(mp.empty()){
+            return -1;
+        }
+        if(mp.count(key)){
+            Node* node=mp[key];
+            int val=node->data;
+            mp.erase(key);
+            deleteNode(node);
+            addNode(node);
+            mp[key]=head->next;
+            return val;
+        }
+        return -1;
+    }
+
+    // Function for storing key-value pair.
+    void put(int key, int value) {
+        // your code here
+        if(!mp.empty() && mp.find(key)!=mp.end()){
+            Node* node=mp[key];
+            mp.erase(key);
+            deleteNode(node);
+        }
+        if(count==capacity){
+            mp.erase(tail->prev->key);
+            deleteNode(tail->prev);
+            
+        }
+        addNode(new Node(key,value));
+        mp[key]=head->next;
+        return;
+    }
+};
 
 
 //{ Driver Code Starts.
@@ -102,12 +111,12 @@ int main() {
         while (queries--) {
             string q;
             cin >> q;
-            if (q == "SET") {
+            if (q == "PUT") {
                 int key;
                 cin >> key;
                 int value;
                 cin >> value;
-                cache->set(key, value);
+                cache->put(key, value);
             } else {
                 int key;
                 cin >> key;
@@ -115,9 +124,7 @@ int main() {
             }
         }
         cout << endl;
-
-        cout << "~"
-             << "\n";
+        cout << "~" << endl;
     }
     return 0;
 }
