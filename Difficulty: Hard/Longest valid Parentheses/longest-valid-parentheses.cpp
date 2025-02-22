@@ -6,45 +6,29 @@ using namespace std;
 
 
 // } Driver Code Ends
-// User function Template for C++
-
-#include <iostream>
-#include <string>
-#include <stack>
-#include <algorithm>
-using namespace std;
 
 class Solution {
-public:
-    int maxLength(string& str) {
-        int n = str.length();
-        int maxLen = 0;
+  public:
+    int maxLength(string& s) {
         stack<int> st;
         st.push(-1);
+        int maxLen = 0;
         
-        int i = 0;
-        while(i < n) {
-            if(str[i] == '(') {
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '(') {
                 st.push(i);
             } else {
                 st.pop();
-                
-                if(!st.empty()) {
+                if (!st.empty()) {
                     maxLen = max(maxLen, i - st.top());
                 } else {
                     st.push(i);
                 }
             }
-            
-            i++;
         }
-        
         return maxLen;
     }
 };
-
-
-
 
 
 //{ Driver Code Starts.
